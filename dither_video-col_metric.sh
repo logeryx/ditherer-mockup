@@ -4,14 +4,14 @@
 # CONFIGURATION CONSTANTS
 # ==============================================================================
 COLORS=4
-MAX_DIST=25.0   # How far off a color can be before it forces a new palette slot
+MAX_DIST=60.0   # How far off a color can be before it forces a new palette slot
 SCALE=6
-BLEND=0.05
+BLEND=0.1
 BIN_SIZE=32
 TRANSFER=0.05
 
 # Pointing to the new adaptive histogram script
-PYTHON_SCRIPT="scripts/histogram_dither.py"
+PYTHON_SCRIPT="scripts/interp-histog+colour-metric+adaptive-palette-count.py"
 # ==============================================================================
 
 # 1. Validate Input
