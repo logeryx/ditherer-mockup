@@ -5,12 +5,12 @@
 # ==============================================================================
 COLORS=4
 SCALE=6
-BLEND=0.3
+BLEND=0.01
 
 # THE MAGIC PARAMETER:
 # 32 or 48 will heavily compress the shadows into a single gray/green 
 # and easily dedicate 2 whole palette slots to your torch.
-BIN_SIZE=12
+BIN_SIZE=16
 
 # Pointing to the new stable binned script
 PYTHON_SCRIPT="density-neutralisation+K-means/scripts/dither.py"
