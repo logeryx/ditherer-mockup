@@ -3,21 +3,17 @@
 # ==============================================================================
 # CONFIGURATION CONSTANTS
 # ==============================================================================
-COLORS=5
+COLORS=4
 SCALE=6
-BLEND=0.25
+BLEND=0.3
 
-# --- Saliency & Luminance Constants ---
-EDGE_WEIGHT=25.0
-SAMPLES=10000
+# THE MAGIC PARAMETER:
+# 32 or 48 will heavily compress the shadows into a single gray/green 
+# and easily dedicate 2 whole palette slots to your torch.
+BIN_SIZE=12
 
-# NEW: The quadratic stretch factor for bright pixels.
-# 0.0 = Linear (normal K-means).
-# 2.0 = Brights are considered mathematically vastly more important than darks.
-BRIGHT_BIAS=400.0
-
-# Pointing to the new saliency script
-PYTHON_SCRIPT="saliency_K-means/scripts/bright-bias.py"
+# Pointing to the new stable binned script
+PYTHON_SCRIPT="density-neutralisation+K-means/scripts/dither.py"
 # ==============================================================================
 
 # 1. Validate Input
@@ -58,10 +54,10 @@ mkdir -p "$DIR_IN"
 mkdir -p "$DIR_OUT"
 
 echo "---------------------------------------------------------"
-echo " Started Saliency/CIELAB Pipeline for: $BASENAME"
+echo " Started Stable Binned Pipeline for: $BASENAME"
 echo " Working Directory: $WORK_DIR"
 echo " Settings: $COLORS Colors, ${SCALE}x Scale, $BLEND Blend"
-echo " Optics: ${BRIGHT_BIAS}x Bright Bias, ${EDGE_WEIGHT}x Edge Weight"
+echo " Bin Size: $BIN_SIZE"
 echo "---------------------------------------------------------"
 
 # 4. Detect Framerate
@@ -86,7 +82,7 @@ fi
 
 # 6. Apply Python Dithering
 echo "[3/4] Applying dithering..."
-.venv/bin/python "$PYTHON_SCRIPT" "$DIR_IN" "$DIR_OUT" -c $COLORS -s $SCALE --blend $BLEND --edge-weight $EDGE_WEIGHT --samples $SAMPLES --bright-bias $BRIGHT_BIAS
+.venv/bin/python "$PYTHON_SCRIPT" "$DIR_IN" "$DIR_OUT" -c $COLORS -s $SCALE --blend $BLEND -b $BIN_SIZE
 
 if [ $? -ne 0 ]; then
     echo "Error: Python dithering script failed!"
@@ -95,7 +91,7 @@ fi
 
 # 7. Reassemble Video
 echo "[4/4] Reassembling output video..."
-OUTPUT_VIDEO="${BASENAME_NO_EXT}_saliency_c${COLORS}_b${BLEND}_bias${BRIGHT_BIAS}.mp4"
+OUTPUT_VIDEO="${BASENAME_NO_EXT}_stable_binned_c${COLORS}_b${BLEND}_b${BIN_SIZE}.mp4"
 
 ffmpeg -v warning -stats -framerate "$FPS" -i "$DIR_OUT/frame_%08d-dither.png" -c:v libx264 -pix_fmt yuv420p -crf 18 "$OUTPUT_VIDEO"
 
