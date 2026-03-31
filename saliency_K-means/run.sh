@@ -3,19 +3,19 @@
 # ==============================================================================
 # CONFIGURATION CONSTANTS
 # ==============================================================================
-COLORS=5
+COLORS=4
 SCALE=6
-BLEND=0.05
+BLEND=0.25
 
 # --- Saliency & Luminance Constants ---
-EDGE_WEIGHT=15.0
-SAMPLES=5000
+EDGE_WEIGHT=25.0
+SAMPLES=10000
 
-# NEW: How much more important is brightness than hue? (e.g., 2.5x more important)
-L_WEIGHT=2.5
+# How much more important is brightness than hue? (e.g., 2.5x more important)
+L_WEIGHT=3.0
 
 # Pointing to the new saliency script
-PYTHON_SCRIPT="scripts/saliency_kmeans_dither.py"
+PYTHON_SCRIPT="saliency_K-means/scripts/luminance-priority.py"
 # ==============================================================================
 
 # 1. Validate Input
@@ -93,7 +93,7 @@ fi
 
 # 7. Reassemble Video
 echo "[4/4] Reassembling output video..."
-OUTPUT_VIDEO="${BASENAME_NO_EXT}_saliency_c${COLORS}_s${SCALE}_L${L_WEIGHT}.mp4"
+OUTPUT_VIDEO="${BASENAME_NO_EXT}_saliency_c${COLORS}_b${BLEND}_L${L_WEIGHT}.mp4"
 
 ffmpeg -v warning -stats -framerate "$FPS" -i "$DIR_OUT/frame_%08d-dither.png" -c:v libx264 -pix_fmt yuv420p -crf 18 "$OUTPUT_VIDEO"
 
