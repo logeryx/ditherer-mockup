@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "uloha2-ImagePallete": {
+      "commandName": "Project",
+      "workingDirectory": "$(ProjectDir)"
+    }
+  }
+}
