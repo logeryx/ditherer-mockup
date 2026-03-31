@@ -4,9 +4,9 @@
 # CONFIGURATION CONSTANTS
 # ==============================================================================
 COLORS=4
-MAX_DIST=60.0   # How far off a color can be before it forces a new palette slot
+MAX_DIST=100.0   # How far off a color can be before it forces a new palette slot
 SCALE=6
-BLEND=0.1
+BLEND=0.05
 BIN_SIZE=32
 TRANSFER=0.05
 
