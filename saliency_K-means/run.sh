@@ -11,11 +11,13 @@ BLEND=0.25
 EDGE_WEIGHT=25.0
 SAMPLES=10000
 
-# How much more important is brightness than hue? (e.g., 2.5x more important)
-L_WEIGHT=3.0
+# NEW: The quadratic stretch factor for bright pixels.
+# 0.0 = Linear (normal K-means).
+# 2.0 = Brights are considered mathematically vastly more important than darks.
+BRIGHT_BIAS=2.0
 
 # Pointing to the new saliency script
-PYTHON_SCRIPT="saliency_K-means/scripts/luminance-priority.py"
+PYTHON_SCRIPT="saliency_K-means/scripts/bright-bias.py"
 # ==============================================================================
 
 # 1. Validate Input
@@ -59,7 +61,7 @@ echo "---------------------------------------------------------"
 echo " Started Saliency/CIELAB Pipeline for: $BASENAME"
 echo " Working Directory: $WORK_DIR"
 echo " Settings: $COLORS Colors, ${SCALE}x Scale, $BLEND Blend"
-echo " Optics: ${L_WEIGHT}x L-Weight, ${EDGE_WEIGHT}x Extremes"
+echo " Optics: ${BRIGHT_BIAS}x Bright Bias, ${EDGE_WEIGHT}x Edge Weight"
 echo "---------------------------------------------------------"
 
 # 4. Detect Framerate
@@ -84,7 +86,7 @@ fi
 
 # 6. Apply Python Dithering
 echo "[3/4] Applying dithering..."
-.venv/bin/python "$PYTHON_SCRIPT" "$DIR_IN" "$DIR_OUT" -c $COLORS -s $SCALE --blend $BLEND --edge-weight $EDGE_WEIGHT --samples $SAMPLES --l-weight $L_WEIGHT
+.venv/bin/python "$PYTHON_SCRIPT" "$DIR_IN" "$DIR_OUT" -c $COLORS -s $SCALE --blend $BLEND --edge-weight $EDGE_WEIGHT --samples $SAMPLES --bright-bias $BRIGHT_BIAS
 
 if [ $? -ne 0 ]; then
     echo "Error: Python dithering script failed!"
@@ -93,7 +95,7 @@ fi
 
 # 7. Reassemble Video
 echo "[4/4] Reassembling output video..."
-OUTPUT_VIDEO="${BASENAME_NO_EXT}_saliency_c${COLORS}_b${BLEND}_L${L_WEIGHT}.mp4"
+OUTPUT_VIDEO="${BASENAME_NO_EXT}_saliency_c${COLORS}_b${BLEND}_bias${BRIGHT_BIAS}.mp4"
 
 ffmpeg -v warning -stats -framerate "$FPS" -i "$DIR_OUT/frame_%08d-dither.png" -c:v libx264 -pix_fmt yuv420p -crf 18 "$OUTPUT_VIDEO"
 
